@@ -1,0 +1,36 @@
+# https://editorconfig.org/
+
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+
+[*.logrotate]
+indent_style = space
+indent_size = 4
+
+[*.pl]
+indent_style = tab
+tab_size = 8
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[{changelog,tests/tox.ini,*NEWS}]
+indent_style = space
+indent_size = 2
+
+[{control,copyright,doc-base,metadata,series,watch,*README*}]
+indent_style = space
+indent_size = 1
+
+[{rules,postinst,postrm,tests/upstream}]
+indent_style = tab
+tab_size = 8
+
+[tests/setup.cfg]
+indent_style = space
+indent_size = 4

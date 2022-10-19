@@ -1,0 +1,11 @@
+[Unit]
+Description=TLS tunnel for network daemons
+After=syslog.target network-online.target
+
+[Service]
+ExecStart=@bindir@/stunnel
+ExecReload=/bin/kill -HUP $MAINPID
+Type=forking
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=TLS tunnel for network daemons - per-config-file service
+Documentation=man:stunnel4(8)
+PartOf=stunnel.target
+
+[Service]
+ExecStart=/usr/bin/stunnel4 /etc/stunnel/%i.conf
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

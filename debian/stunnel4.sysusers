@@ -1,0 +1,9 @@
+# Make sure the stunnel4 group exists
+g stunnel4 -
+
+# Make sure the stunnel4 user account exists
+u stunnel4 -:stunnel4 "stunnel service system account" /var/run/stunnel4
+
+# Make sure the stunnel4 account is a member of the stunnel4 group even if
+# the user account already existed
+m stunnel4 stunnel4

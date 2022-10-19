@@ -1,0 +1,8 @@
+Test-Command: set -e; for py in $(py3versions -i); do printf -- '\n\n====== %s\n\n' "$py"; env PYTHONPATH="$(pwd)/debian/tests/python" "$py" -B -u -m struntime --certdir "$(pwd)/debian/tests/certs"; done
+Depends: @, python3-all
+Features: test-name=debian-python
+
+Test-Command: debian/tests/upstream
+Depends: @, net-tools, netcat-openbsd, python3
+Restrictions: allow-stderr
+Features: test-name=upstream

@@ -1,0 +1,8 @@
+version=4
+
+# Latest version is directly at /stunnel
+opts=pgpsigurlmangle=s/$/.asc/ \
+https://www.stunnel.org/downloads.html downloads/stunnel-([\d.]+)@ARCHIVE_EXT@ debian
+
+opts=pgpsigurlmangle=s/$/.asc/,pasv \
+ftp://ftp.stunnel.org/stunnel/archive/5.x/stunnel-([\d.]+)@ARCHIVE_EXT@

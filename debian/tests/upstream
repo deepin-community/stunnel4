@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+ln -s /usr/bin/stunnel4 src/stunnel
+
+cd tests/certs
+./maketestcert.sh
+cd ../
+if ! python3 maketest.py --debug=10; then
+	printf '\n\n=== Some tests failed; here are all the logs...\n\n' 1>&2
+	find logs/ -type f -name '*.log' -print0 | xargs -0r grep -EHe '^' -- 1>&2
+	false
+fi

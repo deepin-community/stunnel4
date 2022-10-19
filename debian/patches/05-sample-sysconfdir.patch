@@ -1,0 +1,35 @@
+Description: Properly expand @sysconfdir@ in the sample config.
+Bug-Debian: https://bugs.debian.org/871916
+Forwarded: https://stunnel.org/mailman3/hyperkitty/list/stunnel-users@stunnel.org/message/XNLVNAXVZFYKN2MRM7VFGFILHA5GYIN4/
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2022-03-19
+
+--- a/tools/stunnel.conf-sample.in
++++ b/tools/stunnel.conf-sample.in
+@@ -64,7 +64,7 @@
+ accept = 127.0.0.1:110
+ connect = pop.gmail.com:995
+ verifyChain = yes
+-CApath = @sysconfdir/ssl/certs
++CApath = @sysconfdir@/ssl/certs
+ checkHost = pop.gmail.com
+ OCSPaia = yes
+ 
+@@ -73,7 +73,7 @@
+ accept = 127.0.0.1:143
+ connect = imap.gmail.com:993
+ verifyChain = yes
+-CApath = @sysconfdir/ssl/certs
++CApath = @sysconfdir@/ssl/certs
+ checkHost = imap.gmail.com
+ OCSPaia = yes
+ 
+@@ -82,7 +82,7 @@
+ accept = 127.0.0.1:25
+ connect = smtp.gmail.com:465
+ verifyChain = yes
+-CApath = @sysconfdir/ssl/certs
++CApath = @sysconfdir@/ssl/certs
+ checkHost = smtp.gmail.com
+ OCSPaia = yes
+ 

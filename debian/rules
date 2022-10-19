@@ -1,0 +1,115 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# debian/rules file for the Debian GNU/Linux stunnel package
+# Copyright 2003 by Julien LEMOINE <speedblue@debian.org>
+# Copyright 2014 by Peter Pentchev <roam@ringlet.net>
+
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS) $(DEB_BUILD_PROFILES)))
+DEB_NODOC=0
+else
+DEB_NODOC=1
+endif
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND=-Wall
+
+multiarch_path=	$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	  --enable-ipv6 --with-threads=pthread
+
+	# Do not allow this file to be regenerated
+	[ -f src/dhparam.c ]
+	sleep 1
+	touch src/dhparam.c
+
+execute_before_dh_auto_test:
+	env PYTHONPATH='$(CURDIR)/debian/tests/python' \
+		python3 -B -u -m struntime \
+		--certdir='$(CURDIR)/debian/tests/certs' \
+		--program='$(CURDIR)/src/stunnel'
+
+override_dh_auto_test:
+	dh_auto_test || { \
+		printf '\n\n=== Some tests failed; here are all the logs...\n\n' 1>&2; \
+		find tests/logs/ -type f -name '*.log' -print0 | xargs -0r grep -EHe '^' -- 1>&2; \
+		false; \
+	}
+
+override_dh_auto_install:
+	dh_auto_install -- -C src
+ifeq ($(DEB_NODOC),0)
+	dh_auto_install -- -C doc
+endif
+
+	# .la file is useless
+	rm $(CURDIR)/debian/stunnel4/usr/lib/$(multiarch_path)/stunnel/libstunnel.la
+
+	# Rename binary
+	mv $(CURDIR)/debian/stunnel4/usr/bin/stunnel 			\
+	  $(CURDIR)/debian/stunnel4/usr/bin/stunnel4
+
+	# Copy sample init script into place for dh_installinit
+	cp $(CURDIR)/tools/stunnel.init $(CURDIR)/debian/stunnel4.init
+
+ifeq ($(DEB_NODOC),0)
+	ln doc/stunnel.8 doc/stunnel4.8
+	ln doc/stunnel.pl.8 doc/stunnel4.pl.8
+
+	# Manpages will be installed by dh_installman
+	rm -rf $(CURDIR)/debian/stunnel4/usr/share/man
+
+	# Move docs into proper dir
+	mv $(CURDIR)/debian/stunnel4/usr/share/doc/stunnel		\
+	  $(CURDIR)/debian/stunnel4/usr/share/doc/stunnel4
+
+	# Basic docs for the user on how to create an initial configuration
+	install -p -m 0644 $(CURDIR)/debian/stunnel4.conf.README \
+	  $(CURDIR)/debian/stunnel4/etc/stunnel/README
+endif
+
+override_dh_installdocs:
+ifeq ($(DEB_NODOC),0)
+	dh_installdocs
+else
+	mkdir -p $(CURDIR)/debian/stunnel4/usr/share/doc/stunnel4
+	install -p -m 644 $(CURDIR)/debian/copyright $(CURDIR)/debian/stunnel4/usr/share/doc/stunnel4/
+endif
+
+override_dh_installman:
+ifeq ($(DEB_NODOC),0)
+	dh_installman
+endif
+
+execute_after_dh_link:
+ifeq ($(DEB_NODOC),1)
+	rm $(CURDIR)/debian/stunnel4/usr/share/man/man8/stunnel.8.gz
+	rmdir $(CURDIR)/debian/stunnel4/usr/share/man/man8
+	rmdir $(CURDIR)/debian/stunnel4/usr/share/man
+endif
+
+execute_after_dh_installchangelogs:
+	install -m 644 NEWS.md $(CURDIR)/debian/stunnel4/usr/share/doc/stunnel4/NEWS
+
+override_dh_installinit:
+	dh_installinit --no-enable --no-start
+
+override_dh_installsystemd:
+	dh_installsystemd --name stunnel
+
+override_dh_installsystemduser:
+	dh_installsystemduser --name stunnel
+
+override_dh_installppp:
+	dh_installppp --name=0stunnel4
+
+override_dh_compress:
+	dh_compress --exclude=StunnelConf-0.1.pl
+
+%:
+	dh $@

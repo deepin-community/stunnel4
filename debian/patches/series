@@ -1,0 +1,5 @@
+01-fix-paths.patch
+02-rename-binary.patch
+03-runas-user.patch
+04-restore-pidfile-default.patch
+05-sample-sysconfdir.patch

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+USER="stunnel4"
+CHOWN="/bin/chown"
+
+#DEBHELPER#
+
+# /var/run/stunnel4 is not a directory, create it...
+if ! test -d /var/run/stunnel4; then
+	rm -rf /var/run/stunnel4;
+	mkdir /var/run/stunnel4
+fi
+$CHOWN -- "$USER:$USER" /var/run/stunnel4 || true
+
+# /var/log/stunnel4 is not a directory, create it...
+if ! test -d /var/log/stunnel4; then
+	rm -rf /var/log/stunnel4;
+	mkdir /var/log/stunnel4
+fi
+$CHOWN -R -- "$USER:$USER" /var/log/stunnel4
+
+# /var/lib/stunnel4 is not a directory, create it...
+if ! test -d /var/lib/stunnel4; then
+	rm -rf /var/lib/stunnel4;
+	mkdir /var/lib/stunnel4
+fi
+$CHOWN -R -- "$USER:$USER" /var/lib/stunnel4
+
+if ! test -f /var/log/stunnel4/stunnel.log; then
+	touch /var/log/stunnel4/stunnel.log
+	$CHOWN -R -- "$USER:$USER" /var/log/stunnel4/stunnel.log
+fi
